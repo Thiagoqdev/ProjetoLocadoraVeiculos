@@ -18,30 +18,24 @@ public class VeiculoRepository implements Repositorio<Veiculo, String> {
     @Override
     public void adicionar(Veiculo veiculo) {
         Locadora.getVeiculos().add(veiculo);
-        executor.submit(() -> {
-            LocadoraUtils.salvarDadosLocadora();
-        });
+        executor.submit(LocadoraUtils::salvarDadosLocadora);
 
     }
 
     @Override
     public void editar(Veiculo veiculo, String placaAntiga) {
-        Veiculo antigo = buscar(placaAntiga);
-        if (antigo != null) {
+        buscar(placaAntiga).ifPresent(antigo -> {
             antigo.setPlaca(veiculo.getPlaca());
             antigo.setCor(veiculo.getCor());
-            executor.submit(() -> {
-                LocadoraUtils.salvarDadosLocadora();
-            });
-        }
+            executor.submit(LocadoraUtils::salvarDadosLocadora);
+        });
     }
 
     @Override
-    public Veiculo buscar(String placa) {
+    public Optional<Veiculo> buscar(String placa) {
         return Locadora.getVeiculos().stream()
                 .filter(v -> v.getPlaca().equals(placa))
-                .findFirst()
-                .orElse(null);
+                .findFirst();
     }
 
 

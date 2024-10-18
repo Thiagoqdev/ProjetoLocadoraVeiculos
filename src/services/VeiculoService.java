@@ -8,10 +8,7 @@ import entities.veiculo.Veiculo;
 import repositories.VeiculoRepository;
 import utils.ConsoleColors;
 
-import java.util.Collections;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class VeiculoService {
 
@@ -91,13 +88,13 @@ public class VeiculoService {
             System.out.println("Digite a placa do veículo:");
             placa = input.nextLine().trim();
 
-            veiculo = veiculoRepository.buscar(placa);
-            if (veiculo != null) {
+            Optional<Veiculo> veiculoOpt = veiculoRepository.buscar(placa);
+            if (veiculoOpt.isPresent()) {
                 System.out.println("Placa já utilizada por outro veículo. Tente novamente.");
+            } else {
+                return placa;  // Retorna a placa se não estiver em uso
             }
-        } while (veiculo != null);
-
-        return placa;
+        } while (true);
     }
 
     private static String solicitarModelo(Scanner input) {
@@ -161,12 +158,13 @@ public class VeiculoService {
             System.out.println("Digite a placa atual do veículo:");
             String placaAtual = input.nextLine().trim();
 
-            Veiculo veiculo = veiculoRepository.buscar(placaAtual);
-            if (veiculo == null) {
+            Optional<Veiculo> veiculoOpt = veiculoRepository.buscar(placaAtual);
+            if (veiculoOpt.isEmpty()) {
                 System.out.println("Veículo não encontrado.");
                 return;
             }
 
+            Veiculo veiculo = veiculoOpt.get();
             String novaPlaca = solicitarNovaPlaca(input, placaAtual);
             String novaCor = solicitarNovaCor(input, veiculo.getCor());
 
@@ -184,7 +182,6 @@ public class VeiculoService {
 
     private static String solicitarNovaPlaca(Scanner input, String placaAtual) {
         String novaPlaca;
-        Veiculo veiculoExistente;
 
         do {
             System.out.println("Digite a nova placa para o veículo ou tecle <ENTER> para manter a mesma:");
@@ -194,11 +191,13 @@ public class VeiculoService {
                 return placaAtual;
             }
 
-            veiculoExistente = veiculoRepository.buscar(novaPlaca);
-            if (veiculoExistente != null && !veiculoExistente.getPlaca().equals(placaAtual)) {
+            Optional<Veiculo> veiculoExistenteOpt = veiculoRepository.buscar(novaPlaca);
+            if (veiculoExistenteOpt.isPresent() && !veiculoExistenteOpt.get().getPlaca().equals(placaAtual)) {
                 System.out.println("Placa já utilizada por outro veículo.");
+            } else {
+                break;
             }
-        } while (veiculoExistente != null && !veiculoExistente.getPlaca().equals(placaAtual));
+        } while (true);
 
         return novaPlaca;
     }
@@ -215,29 +214,26 @@ public class VeiculoService {
     }
 
     public static void buscar(Scanner input) {
-        System.out.println("Qual veiculo que voce quer buscar? digite a placa");
+        System.out.println("Qual veículo que você quer buscar? Digite a placa:");
         String placaVeiculo = input.nextLine();
 
-        Veiculo veiculo = veiculoRepository.buscar(placaVeiculo);
-
-        if (veiculo != null) {
-            System.out.println(veiculo.mostrarVeiculo());
-        } else {
-            System.out.println("Veículo não encontrado.");
-        }
+        veiculoRepository.buscar(placaVeiculo).ifPresentOrElse(
+                veiculo -> System.out.println(veiculo.mostrarVeiculo()),
+                () -> System.out.println("Veículo não encontrado.")
+        );
     }
 
     public static void remover(Scanner input) {
-        System.out.println("Qual o veiculo que voce quer remover? digite a placa");
+        System.out.println("Qual o veículo que você quer remover? Digite a placa:");
         String placaVeiculo = input.nextLine();
 
-        Veiculo veiculo = veiculoRepository.buscar(placaVeiculo);
-        veiculo = veiculoRepository.remover(veiculo);
-        if (veiculo != null) {
-            System.out.println("Veículo removido com sucesso.");
-        } else {
-            System.out.println("Veículo não encontrado.");
-        }
+        veiculoRepository.buscar(placaVeiculo).ifPresentOrElse(
+                veiculo -> {
+                    veiculoRepository.remover(veiculo);
+                    System.out.println("Veículo removido com sucesso.");
+                },
+                () -> System.out.println("Veículo não encontrado.")
+        );
     }
 
     public static void listar(Scanner input) {
@@ -285,7 +281,7 @@ public class VeiculoService {
         }
     }
 
-    public static Veiculo buscarVeiculo(String placa) {
+    public static Optional<Veiculo> buscarVeiculo(String placa) {
         return veiculoRepository.buscar(placa);
     }
 

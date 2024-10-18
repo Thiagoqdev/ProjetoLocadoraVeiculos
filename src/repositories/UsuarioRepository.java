@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class UsuarioRepository implements Repositorio<Usuario, String> {
     @Override
@@ -21,21 +22,24 @@ public class UsuarioRepository implements Repositorio<Usuario, String> {
 
     @Override
     public void editar(Usuario usuario, String email) {
-        Usuario antigo = buscar(email);
-        int index = Locadora.getUsuarios().indexOf(antigo);
-        if(index != -1) {
-            Usuario editado = Locadora.getUsuarios().get(index);
-            editado.setNome(usuario.getNome());
-            editado.setEmail(usuario.getEmail());
-            if (editado instanceof Administrador adminUser) {
-                adminUser.setNumeroRegistro(((Administrador) usuario).getNumeroRegistro());
-            } else if (editado instanceof PessoaFisica pessoaFisica) {
-                pessoaFisica.setCpf(((PessoaFisica) usuario).getCpf());
-            } else if (editado instanceof PessoaJuridica pessoaJuridica) {
-                pessoaJuridica.setCnpj(((PessoaJuridica) usuario).getCnpj());
+        buscar(email).ifPresent(antigo -> {
+            int index = Locadora.getUsuarios().indexOf(antigo);
+            if (index != -1) {
+                Usuario editado = Locadora.getUsuarios().get(index);
+                editado.setNome(usuario.getNome());
+                editado.setEmail(usuario.getEmail());
+
+                if (editado instanceof Administrador adminUser && usuario instanceof Administrador) {
+                    adminUser.setNumeroRegistro(((Administrador) usuario).getNumeroRegistro());
+                } else if (editado instanceof PessoaFisica pessoaFisica && usuario instanceof PessoaFisica) {
+                    pessoaFisica.setCpf(((PessoaFisica) usuario).getCpf());
+                } else if (editado instanceof PessoaJuridica pessoaJuridica && usuario instanceof PessoaJuridica) {
+                    pessoaJuridica.setCnpj(((PessoaJuridica) usuario).getCnpj());
+                }
+
+                LocadoraUtils.salvarDadosLocadora();
             }
-            LocadoraUtils.salvarDadosLocadora();
-        }
+        });
     }
 
     @Override
@@ -49,15 +53,12 @@ public class UsuarioRepository implements Repositorio<Usuario, String> {
         return null;
     }
 
-    @Override
-    public Usuario buscar(String email) {
-        for(Usuario u : Locadora.getUsuarios()){
-            if(u.getEmail().equals(email)){
-                return u;
-            }
-        }
-        return null;
+    public Optional<Usuario> buscar(String email) {
+        return Locadora.getUsuarios().stream()
+                .filter(u -> u.getEmail().equals(email))
+                .findFirst();
     }
+
 
     public static List<Usuario> buscarPorParteDoNome(String parteDoNome) {
         List<Usuario> usuariosEncontrados = new ArrayList<>();

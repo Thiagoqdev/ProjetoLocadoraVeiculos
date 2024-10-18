@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 import static services.VeiculoService.buscarVeiculo;
@@ -53,7 +54,8 @@ public class AluguelService {
             return;
         }
 
-        Agencia localRetirada = AgenciaService.buscarAgencia(escolhido.getCodAgenciaAtual());
+        Agencia localRetirada = AgenciaService.buscarAgencia(escolhido.getCodAgenciaAtual())
+                .orElseThrow(() -> new IllegalArgumentException("Agência de retirada não encontrada"));
 
         Integer codAgenciaDevolucao = null;
         while (codAgenciaDevolucao == null) {
@@ -68,11 +70,8 @@ public class AluguelService {
 
         input.nextLine();
 
-        Agencia localDevolucao = AgenciaService.buscarAgencia(codAgenciaDevolucao);
-        if (localDevolucao == null) {
-            System.out.println("A agência de devolução não foi encontrada, tente novamente!");
-            return;
-        }
+        Agencia localDevolucao = AgenciaService.buscarAgencia(codAgenciaDevolucao)
+                .orElseThrow(() -> new IllegalArgumentException("Agência de devolução não encontrada"));
 
         System.out.println("Digite a data de devolução no formato <dd/MM/yyyy>:");
         LocalDateTime dataDevolucao;
@@ -108,25 +107,29 @@ public class AluguelService {
 
         System.out.println("Digite a placa do veículo que está sendo devolvido: ");
         String placa = input.nextLine();
-        Veiculo devolvido = buscarVeiculo(placa);
+        Optional<Veiculo> veiculoOpt = buscarVeiculo(placa);
 
+
+        if (veiculoOpt.isEmpty()) {
+            System.out.println("Veículo não encontrado.");
+            return;
+        }
+
+        Veiculo devolvido = veiculoOpt.get();
 
         if (devolvido.isDisponivel()) {
             System.out.println("Não é possível devolver um veículo que não foi alugado!");
             return;
         }
-        if (devolvido == null) {
-            System.out.println("Veículo não encontrado.");
-        } else {
-            List<Aluguel> alugueis = aluguelRepository.buscarPorCliente(cliente);
-            for (Aluguel aluguel : alugueis) {
-                if (aluguel.getCliente().equals(cliente)) {
-                    devolvido.setDisponivel(true);
-                    System.out.println(gerarExtratoDetalhado(aluguel));
-                    break;
-                }
+
+        List<Aluguel> alugueis = aluguelRepository.buscarPorCliente(cliente);
+        for (Aluguel aluguel : alugueis) {
+            if (aluguel.getCliente().equals(cliente)) {
+                devolvido.setDisponivel(true);
+                System.out.println(gerarExtratoDetalhado(aluguel));
+                System.out.println("Veículo devolvido com sucesso.");
+                break;
             }
-            System.out.println("Veículo devolvido com sucesso.");
         }
     }
 

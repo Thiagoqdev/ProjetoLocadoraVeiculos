@@ -4,6 +4,8 @@ import utils.ConsoleColors;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static utils.menus.MenuCrudAgencias.crudAgencias;
 import static utils.menus.MenuCrudClientes.crudClientes;
@@ -13,6 +15,7 @@ public abstract class MenuAdm {
 
     public static void mostrarMenuAdministrador(Scanner input) {
         boolean ativo = true;
+        ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         while (ativo) {
             exibirMenuAdministrador();
@@ -28,13 +31,14 @@ public abstract class MenuAdm {
             }
 
             switch (opcao) {
-                case 1 -> crudClientes(input);
-                case 2 -> crudAgencias(input);
-                case 3 -> crudVeiculos(input);
+                case 1 -> executorService.submit(()->crudClientes(input));
+                case 2 -> executorService.submit(()->crudAgencias(input));
+                case 3 -> executorService.submit(()->crudVeiculos(input));
                 case 4 -> ativo = false;
                 default -> System.out.println("Opção inválida. Tente novamente.");
             }
         }
+        executorService.shutdown();
     }
 
     private static void exibirMenuAdministrador() {

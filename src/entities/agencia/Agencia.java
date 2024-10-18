@@ -1,6 +1,7 @@
 package entities.agencia;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class Agencia implements Comparable<Agencia> {
 
@@ -18,16 +19,16 @@ public class Agencia implements Comparable<Agencia> {
         return codigo;
     }
 
-    public String getNome() {
-        return nome;
+    public Optional<String> getNome() {
+        return Optional.ofNullable(nome);
     }
 
     public void setNome(String nome) {
         this.nome = nome;
     }
 
-    public Endereco getEndereco() {
-        return endereco;
+    public Optional<Endereco> getEndereco() {
+        return Optional.ofNullable(endereco);
     }
 
     public void setEndereco(Endereco endereco) {
@@ -48,8 +49,8 @@ public class Agencia implements Comparable<Agencia> {
     }
 
     public String mostrarAgencia() {
-        return "Nome da agência: " + nome + "\n"
-                + endereco.mostrarEndereco();
+        return "Nome da agência: " + getNome() + "\n" +
+                endereco.mostrarEndereco();
     }
 
     @Override
