@@ -1,6 +1,7 @@
 package entities.agencia;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class Endereco {
 
@@ -20,54 +21,54 @@ public class Endereco {
         this.cep = cep;
     }
 
-
-    public String getLogradouro() {
-        return logradouro;
+    public Optional<String> getLogradouro() {
+        return Optional.ofNullable(logradouro);
     }
 
     public void setLogradouro(String logradouro) {
         this.logradouro = logradouro;
     }
 
-    public Integer getNumero() {
-        return numero;
-    }
-
-    public String getComplemento() {
-        return complemento;
-    }
-
-    public void setComplemento(String complemento) {
-        this.complemento = complemento;
+    public Optional<Integer> getNumero() {
+        return Optional.ofNullable(numero);
     }
 
     public void setNumero(Integer numero) {
         this.numero = numero;
     }
 
-    public String getCidade() {
-        return cidade;
+    public Optional<String> getComplemento() {
+        return Optional.ofNullable(complemento);
+    }
+
+    public void setComplemento(String complemento) {
+        this.complemento = complemento;
+    }
+
+    public Optional<String> getCidade() {
+        return Optional.ofNullable(cidade);
     }
 
     public void setCidade(String cidade) {
         this.cidade = cidade;
     }
 
-    public String getEstado() {
-        return estado;
+    public Optional<String> getEstado() {
+        return Optional.ofNullable(estado);
     }
 
     public void setEstado(String estado) {
         this.estado = estado;
     }
 
-    public String getCep() {
-        return cep;
+    public Optional<String> getCep() {
+        return Optional.ofNullable(cep);
     }
 
     public void setCep(String cep) {
         this.cep = cep;
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -84,16 +85,16 @@ public class Endereco {
 
     @Override
     public int hashCode() {
-        return Objects.hash(logradouro, numero, cidade, estado, cep);
+        return Objects.hash(logradouro, numero, complemento, cidade, estado, cep);
     }
 
     public String mostrarEndereco() {
-        return "Logradouro: " + logradouro +
-                "\nNumero: " + numero +
-                "\nComplemento: " + complemento +
-                "\nCidade: " + cidade +
-                "\nEstado: " + estado +
-                "\nCEP: " + cep;
+        return "Logradouro: " + getLogradouro().orElse("Desconhecido") +
+                "\nNumero: " + getNumero().map(String::valueOf).orElse("Desconhecido") +
+                "\nComplemento: " + getComplemento().orElse("Desconhecido") +
+                "\nCidade: " + getCidade().orElse("Desconhecido") +
+                "\nEstado: " + getEstado().orElse("Desconhecido") +
+                "\nCEP: " + getCep().orElse("Desconhecido");
     }
 
     @Override

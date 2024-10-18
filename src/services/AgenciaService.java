@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
+import java.util.Optional;
 
 public class AgenciaService {
 
@@ -22,50 +23,67 @@ public class AgenciaService {
             System.out.println("==============================================");
             System.out.println("|             Lista de Agências              |");
             System.out.println("==============================================");
-            for (Agencia agencia : agencias) {
+            agencias.forEach(agencia -> {
                 System.out.println("| Código: " + agencia.getCodigo());
-                System.out.println("| Nome: " + agencia.getNome());
+                System.out.println("| Nome: " + agencia.getNome().orElse("Desconhecido"));
                 System.out.println("| Endereço: ");
-                System.out.println(agencia.getEndereco().mostrarEndereco());
+                agencia.getEndereco().ifPresentOrElse(
+                        endereco -> System.out.println(endereco.mostrarEndereco()),
+                        () -> System.out.println("Endereço desconhecido")
+                );
                 System.out.println("==============================================");
-            }
+            });
         }
     }
 
     public static void buscarAgencia(Scanner input) {
         System.out.println("Digite o código da agência:");
-        Integer codigo = input.nextInt();
-        input.nextLine();
-        Agencia agencia = agenciaRepository.buscar(codigo);
-        if (agencia != null) {
-            System.out.println("==============================================");
-            System.out.println("|            Agência Encontrada              |");
-            System.out.println("==============================================");
-            System.out.println("| Código: " + agencia.getCodigo());
-            System.out.println("| Nome: " + agencia.getNome());
-            System.out.println("| Endereço: ");
-            System.out.println(agencia.getEndereco().mostrarEndereco());
-            System.out.println("==============================================");
+        if (input.hasNextInt()) {
+            Integer codigo = input.nextInt();
+            input.nextLine();
+            Optional<Agencia> agenciaOpt = agenciaRepository.buscar(codigo);
+            agenciaOpt.ifPresentOrElse(
+                    agencia -> {
+                        System.out.println("==============================================");
+                        System.out.println("|            Agência Encontrada              |");
+                        System.out.println("==============================================");
+                        System.out.println("| Código: " + agencia.getCodigo());
+                        System.out.println("| Nome: " + agencia.getNome().orElse("Desconhecido"));
+                        System.out.println("| Endereço: ");
+                        agencia.getEndereco().ifPresentOrElse(
+                                endereco -> System.out.println(endereco.mostrarEndereco()),
+                                () -> System.out.println("Endereço desconhecido")
+                        );
+                        System.out.println("==============================================");
+                    },
+                    () -> System.out.println("Agência não encontrada.")
+            );
         } else {
-            System.out.println("Agência não encontrada.");
+            System.out.println("Entrada inválida. Por favor, insira um número válido.");
+            input.nextLine();
         }
     }
 
-    public static void buscarAgenciaPorParteDoNome(Scanner input){
+    public static void buscarAgenciaPorParteDoNome(Scanner input) {
         System.out.println("Digite uma parte do nome da agência: ");
         String parteNome = input.nextLine();
 
         List<Agencia> agencias = AgenciaRepository.buscarPorParteDoNome(parteNome);
 
-        for(Agencia agencia : agencias){
-            System.out.println(agencia.mostrarAgencia());
-            System.out.println("==============================================");
+        if (agencias.isEmpty()) {
+            System.out.println("Nenhuma agência encontrada com esse nome.");
+        } else {
+            agencias.forEach(agencia -> {
+                System.out.println(agencia.mostrarAgencia());
+                System.out.println("==============================================");
+            });
         }
     }
 
-    public static Agencia buscarAgencia(Integer codigo) {
+    public static Optional<Agencia> buscarAgencia(Integer codigo) {
         return agenciaRepository.buscar(codigo);
     }
+
 
     public static void adicionarAgencia(Scanner input) {
         System.out.println("Digite o código da agência:");
@@ -100,75 +118,96 @@ public class AgenciaService {
         System.out.println("Agência adicionada com sucesso!");
     }
 
+
     public static void editarAgencia(Scanner input) {
         System.out.println("Digite o código da agência a ser editada:");
-        Integer codigo = input.nextInt();
-        input.nextLine();
-        Agencia agencia = agenciaRepository.buscar(codigo);
-
-        if (agencia == null) {
-            System.out.println("Agência não encontrada");
-            return;
-        }
-
-        Agencia original = new Agencia(agencia.getCodigo(), agencia.getNome(), agencia.getEndereco());
-
-        System.out.println("Digite o novo nome da agência ou tecle <ENTER> para manter o atual:");
-        String novoNome = input.nextLine();
-        agencia.setNome(novoNome.isEmpty() ? agencia.getNome() : novoNome);
-
-        System.out.println("Deseja alterar o endereço? (S/N)");
-        String opcao = input.nextLine();
-
-        if (opcao.equalsIgnoreCase("S")) {
-            System.out.println("Digite o novo logradouro do endereço:");
-            String novoLogradouro = input.nextLine();
-            agencia.getEndereco().setLogradouro(novoLogradouro);
-
-            System.out.println("Digite o novo número:");
-            Integer novoNumero = input.nextInt();
-            agencia.getEndereco().setNumero(novoNumero);
+        if (input.hasNextInt()) {
+            Integer codigo = input.nextInt();
             input.nextLine();
+            Agencia agencia = agenciaRepository.buscar(codigo)
+                    .orElse(null);
 
-            System.out.println("Digite o novo complemento:");
-            String novoComplemento = input.nextLine();
-            agencia.getEndereco().setComplemento(novoComplemento);
+            if (agencia == null) {
+                System.out.println("Agência não encontrada");
+                return;
+            }
 
-            System.out.println("Digite a nova cidade:");
-            String novaCidade = input.nextLine();
-            agencia.getEndereco().setCidade(novaCidade);
+            Agencia original = new Agencia(agencia.getCodigo(), agencia.getNome().orElse(""), agencia.getEndereco().orElse(null));
 
-            System.out.println("Digite o novo estado:");
-            String novoEstado = input.nextLine();
-            agencia.getEndereco().setEstado(novoEstado);
+            System.out.println("Digite o novo nome da agência ou tecle <ENTER> para manter o atual:");
+            String novoNome = input.nextLine();
+            agencia.setNome(novoNome.isEmpty() ? agencia.getNome().orElse("") : novoNome);
 
-            System.out.println("Digite o novo CEP:");
-            String novoCep = input.nextLine();
-            agencia.getEndereco().setCep(novoCep);
-        }
+            System.out.println("Deseja alterar o endereço? (S/N)");
+            String opcao = input.nextLine();
 
-        if (agencia.equals(original)) {
-            System.out.println("Nenhuma alteração foi feita.");
-        } else if (agenciaRepository.existeAgenciaComMesmosDados(agencia)) {
-            System.out.println("Já existe uma agência com esses dados no sistema.");
+            if (opcao.equalsIgnoreCase("S")) {
+                agencia.getEndereco().ifPresent(endereco -> {
+                    System.out.println("Digite o novo logradouro do endereço:");
+                    String novoLogradouro = input.nextLine();
+                    endereco.setLogradouro(novoLogradouro);
+
+                    System.out.println("Digite o novo número:");
+                    Integer novoNumero = input.nextInt();
+                    endereco.setNumero(novoNumero);
+                    input.nextLine();
+
+                    System.out.println("Digite o novo complemento:");
+                    String novoComplemento = input.nextLine();
+                    endereco.setComplemento(novoComplemento);
+
+                    System.out.println("Digite a nova cidade:");
+                    String novaCidade = input.nextLine();
+                    endereco.setCidade(novaCidade);
+
+                    System.out.println("Digite o novo estado:");
+                    String novoEstado = input.nextLine();
+                    endereco.setEstado(novoEstado);
+
+                    System.out.println("Digite o novo CEP:");
+                    String novoCep = input.nextLine();
+                    endereco.setCep(novoCep);
+                });
+            }
+
+            if (agencia.equals(original)) {
+                System.out.println("Nenhuma alteração foi feita.");
+            } else if (agenciaRepository.existeAgenciaComMesmosDados(agencia)) {
+                System.out.println("Já existe uma agência com esses dados no sistema.");
+            } else {
+                agenciaRepository.editar(agencia, codigo);
+                System.out.println("Agência editada com sucesso!");
+            }
         } else {
-            agenciaRepository.editar(agencia, codigo);
-            System.out.println("Agência editada com sucesso!");
+            System.out.println("Entrada inválida. Por favor, insira um número válido.");
+            input.nextLine(); // Limpa o buffer do scanner
         }
     }
 
+
     public static void removerAgencia(Scanner input) {
         System.out.println("Digite o código da agência que deseja remover:");
-        Integer codigo = input.nextInt();
+        if (input.hasNextInt()) {
+            Integer codigo = input.nextInt();
+            input.nextLine(); // Limpa o buffer do scanner
 
-        for (Agencia agencia : agenciaRepository.listar()) {
-            if (Objects.equals(agencia.getCodigo(), codigo)) {
-                agenciaRepository.remover(agencia);
-                System.out.println("Agência removida com sucesso.");
-                LocadoraUtils.salvarDadosLocadora();
-                break;
+            boolean agenciaRemovida = agenciaRepository.listar().stream()
+                    .filter(agencia -> Objects.equals(agencia.getCodigo(), codigo))
+                    .findFirst()
+                    .map(agencia -> {
+                        agenciaRepository.remover(agencia);
+                        System.out.println("Agência removida com sucesso.");
+                        LocadoraUtils.salvarDadosLocadora();
+                        return true;
+                    })
+                    .orElse(false);
+
+            if (!agenciaRemovida) {
+                System.out.println("Agência não encontrada.");
             }
+        } else {
+            System.out.println("Entrada inválida. Por favor, insira um número válido.");
+            input.nextLine(); // Limpa o buffer do scanner
         }
-        System.out.println("Agência não encontrada.");
     }
 }

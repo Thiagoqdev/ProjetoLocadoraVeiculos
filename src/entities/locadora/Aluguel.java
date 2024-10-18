@@ -37,17 +37,17 @@ public class Aluguel {
     }
 
     public BigDecimal calcularValorTotal() {
-        if(dataDevolucao == null) {
+        if (dataDevolucao == null) {
             dataDevolucao = LocalDateTime.now();
         }
         long qtidadeDias = calcularDiasAlugados();
-        if(qtidadeDias < 0) qtidadeDias *= -1;
+        if (qtidadeDias < 0) qtidadeDias *= -1;
 
         switch (cliente.getTipoUsuario()) {
             case PF -> {
                 return switch (veiculo.getTipo()) {
                     case CARRO -> {
-                        if(qtidadeDias > 5) yield BigDecimal.valueOf((150.00 * qtidadeDias) * 0.95);
+                        if (qtidadeDias > 5) yield BigDecimal.valueOf((150.00 * qtidadeDias) * 0.95);
                         yield BigDecimal.valueOf((150.00 * qtidadeDias));
                     }
                     case MOTO -> BigDecimal.valueOf(100.00 * qtidadeDias);
@@ -57,7 +57,7 @@ public class Aluguel {
             case PJ -> {
                 return switch (veiculo.getTipo()) {
                     case CARRO -> {
-                        if(qtidadeDias > 3) yield BigDecimal.valueOf((150.00 * qtidadeDias) * 0.90);
+                        if (qtidadeDias > 3) yield BigDecimal.valueOf((150.00 * qtidadeDias) * 0.90);
                         yield BigDecimal.valueOf((150.00 * qtidadeDias));
                     }
                     case MOTO -> BigDecimal.valueOf(100.00 * qtidadeDias);
@@ -150,7 +150,7 @@ public class Aluguel {
 
     public String mostrarAluguel() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        return  "ID: " + id + "\n" +
+        return "ID: " + id + "\n" +
                 "Cliente: " + cliente.getNome() + "\n" +
                 "Veiculo: " + veiculo.getModelo() + "\n" +
                 "Data de retirada: " + dataRetirada.format(formatter) + "\n" +
@@ -163,7 +163,7 @@ public class Aluguel {
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        return    id + ";"
+        return id + ";"
                 + cliente.getEmail() + ";"
                 + veiculo.getPlaca() + ";"
                 + dataRetirada.format(formatter) + ";"
@@ -185,11 +185,19 @@ public class Aluguel {
         Integer codigoLocalDevolucao = Integer.parseInt(partes[6]);
         BigDecimal valorAluguel = NumberFormatter.valorStringToBigDecimal(partes[7]);
 
-        Cliente cliente = UsuarioService.buscarCliente(emailCliente);
-        Veiculo veiculo = VeiculoService.buscarVeiculo(placaVeiculo);
-        Agencia agenciaRetirada = AgenciaService.buscarAgencia(codigoLocalRetirada);
-        Agencia agenciaDevolucao = AgenciaService.buscarAgencia(codigoLocalDevolucao);
+        Cliente cliente = UsuarioService.buscarCliente(emailCliente)
+                .orElseThrow(() -> new IllegalArgumentException("Cliente não encontrado"));
+
+        Veiculo veiculo = VeiculoService.buscarVeiculo(placaVeiculo)
+                .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado"));
+
+        Agencia agenciaRetirada = AgenciaService.buscarAgencia(codigoLocalRetirada)
+                .orElseThrow(() -> new IllegalArgumentException("Agência de retirada não encontrada"));
+
+        Agencia agenciaDevolucao = AgenciaService.buscarAgencia(codigoLocalDevolucao)
+                .orElseThrow(() -> new IllegalArgumentException("Agência de devolução não encontrada"));
 
         return new Aluguel(id, cliente, veiculo, dataRetirada, dataDevolucao, agenciaRetirada, agenciaDevolucao, valorAluguel);
     }
 }
+

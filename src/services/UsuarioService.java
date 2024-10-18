@@ -7,6 +7,7 @@ import utils.ConsoleColors;
 
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class UsuarioService {
@@ -115,9 +116,8 @@ public class UsuarioService {
         }
     }
 
-    private static boolean emailExistente(String email, Usuario usuario) {
-        Usuario usuarioExistente = usuarioRepository.buscar(email);
-        return usuarioExistente != null;
+    private static boolean emailExistente(String email) {
+        return usuarioRepository.buscar(email).isPresent();
     }
 
     private static int mostrarMenuDeAdicao(Scanner input) {
@@ -134,12 +134,14 @@ public class UsuarioService {
     public static void editar(Scanner input) {
         System.out.println("Digite o email do usuário que deseja alterar dados: ");
         String email = input.nextLine();
-        Usuario usuario = usuarioRepository.buscar(email);
+        Optional<Usuario> usuarioOptional = usuarioRepository.buscar(email);
 
-        if (usuario == null) {
+        if (usuarioOptional.isEmpty()) {
             System.out.println(ConsoleColors.CYAN_BOLD_BRIGHT + "\nUsuário não encontrado.\n" + ConsoleColors.RESET);
             return;
         }
+
+        Usuario usuario = usuarioOptional.get();
 
         atualizarEmail(usuario, input);
         atualizarNome(usuario, input);
@@ -159,11 +161,12 @@ public class UsuarioService {
         System.out.println("Digite um novo email para o usuário ou tecle <ENTER> para manter o mesmo: ");
         String novoEmail = input.nextLine();
 
-        while (emailExistente(novoEmail, usuario)) {
+        while (!novoEmail.isEmpty() && emailExistente(novoEmail)) {
             System.out.println("Email já cadastrado para outro usuário.");
             System.out.println("Digite um novo email para o usuário ou tecle <ENTER> para manter o mesmo: ");
-            novoEmail = input.nextLine();
+            novoEmail = input.nextLine().trim();
         }
+
 
         usuario.setEmail(novoEmail.isEmpty() ? usuario.getEmail() : novoEmail);
     }
@@ -210,12 +213,15 @@ public class UsuarioService {
         }
     }
 
-    public static Cliente buscarCliente(String email) {
+    public static Optional<Cliente> buscarCliente(String email) {
         Usuario usuario = usuarioRepository.buscar(email);
+
+        Optional<Cliente> cliente = Optional.empty();
+
         if (usuario instanceof Cliente cliente) {
-            return cliente;
+            return Optional.of(cliente);
         }
-        return null;
+        return Optional.empty();
     }
 
     public static void buscarPorParteDoNome(Scanner input){
@@ -233,9 +239,10 @@ public class UsuarioService {
         System.out.println("Digite o email do usuário: ");
         String email = input.nextLine();
 
-        Usuario usuario = usuarioRepository.buscar(email);
+        Optional<Usuario> usuarioOptional = usuarioRepository.buscar(email);
 
-        if (usuario != null) {
+        if (usuarioOptional.isPresent()) {
+            Usuario usuario = usuarioOptional.get();
             usuarioRepository.remover(usuario);
             System.out.println("Usuário removido com sucesso.");
         } else {

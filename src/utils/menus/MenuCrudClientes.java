@@ -22,6 +22,7 @@ public abstract class MenuCrudClientes {
                 input.nextLine();
             } catch (InputMismatchException e) {
                 System.out.println(ConsoleColors.RED_BOLD + "Opção inválida. Apenas valores numéricos são aceitos." + ConsoleColors.RESET);
+                input.nextLine();
                 ativo = false;
                 opcao = 6;
             }
