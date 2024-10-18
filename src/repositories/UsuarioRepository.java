@@ -16,47 +16,35 @@ public class UsuarioRepository implements Repositorio<Usuario, String> {
     @Override
     public void adicionar(Usuario usuario) {
         Locadora.getUsuarios().add(usuario);
-        try {
-            LocadoraUtils.salvarDadosLocadora();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        LocadoraUtils.salvarDadosLocadora();
     }
 
     @Override
     public void editar(Usuario usuario, String email) {
-        try {
-            Usuario antigo = buscar(email);
-            int index = Locadora.getUsuarios().indexOf(antigo);
-            if(index != -1) {
-                Usuario editado = Locadora.getUsuarios().get(index);
-                editado.setNome(usuario.getNome());
-                editado.setEmail(usuario.getEmail());
-                if (editado instanceof Administrador adminUser) {
-                    adminUser.setNumeroRegistro(((Administrador) usuario).getNumeroRegistro());
-                } else if (editado instanceof PessoaFisica pessoaFisica) {
-                    pessoaFisica.setCpf(((PessoaFisica) usuario).getCpf());
-                } else if (editado instanceof PessoaJuridica pessoaJuridica) {
-                    pessoaJuridica.setCnpj(((PessoaJuridica) usuario).getCnpj());
-                }
-                LocadoraUtils.salvarDadosLocadora();
+        Usuario antigo = buscar(email);
+        int index = Locadora.getUsuarios().indexOf(antigo);
+        if(index != -1) {
+            Usuario editado = Locadora.getUsuarios().get(index);
+            editado.setNome(usuario.getNome());
+            editado.setEmail(usuario.getEmail());
+            if (editado instanceof Administrador adminUser) {
+                adminUser.setNumeroRegistro(((Administrador) usuario).getNumeroRegistro());
+            } else if (editado instanceof PessoaFisica pessoaFisica) {
+                pessoaFisica.setCpf(((PessoaFisica) usuario).getCpf());
+            } else if (editado instanceof PessoaJuridica pessoaJuridica) {
+                pessoaJuridica.setCnpj(((PessoaJuridica) usuario).getCnpj());
             }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            LocadoraUtils.salvarDadosLocadora();
         }
     }
 
     @Override
     public Usuario remover(Usuario usuario) {
-        try {
-            int index = Locadora.getUsuarios().indexOf(usuario);
-            if(index != -1) {
-                Usuario removido = Locadora.getUsuarios().remove(index);
-                LocadoraUtils.salvarDadosLocadora();
-                return removido;
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Erro ao salvar os dados da locadora.", e);
+        int index = Locadora.getUsuarios().indexOf(usuario);
+        if(index != -1) {
+            Usuario removido = Locadora.getUsuarios().remove(index);
+            LocadoraUtils.salvarDadosLocadora();
+            return removido;
         }
         return null;
     }

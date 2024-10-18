@@ -15,11 +15,7 @@ public class AluguelRepositoryImplementacao implements AluguelRepository {
     @Override
     public void salvarAluguel(Aluguel aluguel) {
         Locadora.getAlugueis().add(aluguel);
-        try {
-            LocadoraUtils.salvarDadosLocadora();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        LocadoraUtils.salvarDadosLocadora();
     }
 
     @Override

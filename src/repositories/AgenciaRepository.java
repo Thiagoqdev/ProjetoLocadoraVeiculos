@@ -15,39 +15,27 @@ public class AgenciaRepository implements Repositorio<Agencia, Integer> {
     @Override
     public void adicionar(Agencia agencia) {
         Locadora.getAgencias().add(agencia);
-        try {
-            LocadoraUtils.salvarDadosLocadora();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        LocadoraUtils.salvarDadosLocadora();
     }
 
 
     @Override
     public void editar(Agencia agencia, Integer codAgencia) {
-        try {
-            Agencia antiga = buscar(codAgencia);
-            if (antiga != null) {
-                antiga.setNome(agencia.getNome());
-                antiga.setEndereco(agencia.getEndereco());
-                LocadoraUtils.salvarDadosLocadora();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Erro ao salvar os dados da locadora.", e);
+        Agencia antiga = buscar(codAgencia);
+        if (antiga != null) {
+            antiga.setNome(agencia.getNome());
+            antiga.setEndereco(agencia.getEndereco());
+            LocadoraUtils.salvarDadosLocadora();
         }
     }
 
     @Override
     public Agencia remover(Agencia agencia) {
-        try {
-            int index = Locadora.getAgencias().indexOf(buscar(agencia.getCodigo()));
-            if (index != -1) {
-                Agencia removido = Locadora.getAgencias().remove(index);
-                LocadoraUtils.salvarDadosLocadora();
-                return removido;
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        int index = Locadora.getAgencias().indexOf(buscar(agencia.getCodigo()));
+        if (index != -1) {
+            Agencia removido = Locadora.getAgencias().remove(index);
+            LocadoraUtils.salvarDadosLocadora();
+            return removido;
         }
         return null;
     }

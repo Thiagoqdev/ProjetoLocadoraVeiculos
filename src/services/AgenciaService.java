@@ -163,14 +163,10 @@ public class AgenciaService {
 
         for (Agencia agencia : agenciaRepository.listar()) {
             if (Objects.equals(agencia.getCodigo(), codigo)) {
-                try {
-                    agenciaRepository.remover(agencia);
-                    System.out.println("Agência removida com sucesso.");
-                    LocadoraUtils.salvarDadosLocadora();
-                    break;
-                } catch (IOException e) {
-                    throw new RuntimeException("Erro ao salvar os dados: " + e.getMessage());
-                }
+                agenciaRepository.remover(agencia);
+                System.out.println("Agência removida com sucesso.");
+                LocadoraUtils.salvarDadosLocadora();
+                break;
             }
         }
         System.out.println("Agência não encontrada.");
