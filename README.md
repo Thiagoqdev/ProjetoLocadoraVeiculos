@@ -1,6 +1,6 @@
 
 ## Participante
-- [Thiago Vinícius](https://github.com/Thiagoqdev)
+- [Thiago Vinícius dos Santos Queiroz](https://github.com/Thiagoqdev)
 
 
 # Documentação do Projeto Rental Cars - Modulo Tecnicas de programação 
