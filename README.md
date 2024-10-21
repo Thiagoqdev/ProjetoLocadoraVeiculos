@@ -118,10 +118,5 @@ flowchart TD
 ```
 
 
-## Participantes
-
-- [Daniel Rodrigues](https://github.com/danielrdrgsn)
-- [Eloise Helena](https://github.com/EloiseHelena)
+## Participante
 - [Thiago Vinícius](https://github.com/Thiagoqdev)
-- [Samuel Quaresma](https://github.com/squoliver83)
-- [Vinícius Augusto](https://github.com/vinicius-augusto1)
