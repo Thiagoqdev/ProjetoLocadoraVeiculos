@@ -3,7 +3,7 @@
 - [Thiago Vinícius](https://github.com/Thiagoqdev)
 
 
-# Documentação do Projeto Rental Cars Modulo Tenicas de programação 
+# Documentação do Projeto Rental Cars - Modulo Tecnicas de programação 
 
 ## Introdução
 
