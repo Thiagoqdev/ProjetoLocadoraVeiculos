@@ -14,7 +14,9 @@ O sistema simula uma locadora de veículos
 ## Tecnologias Utilizadas
 
 - **Java**: Linguagem de programação utilizada para o desenvolvimento do sistema.
-- **Estruturas de Dados**: Listas, Classes e Objetos.
+- **Estruturas de Dados**: Listas, Classes Objetos, Uso de stream e optional.
+  - Uso de thread e runnable 
+  - Leitura e escrita de arquivos com a API do NIO 2
 - **Console Colors**: Para exibir mensagens coloridas no console.
 
 ## Estrutura do Projeto
