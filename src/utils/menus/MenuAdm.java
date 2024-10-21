@@ -15,7 +15,6 @@ public abstract class MenuAdm {
 
     public static void mostrarMenuAdministrador(Scanner input) {
         boolean ativo = true;
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
 
         while (ativo) {
             exibirMenuAdministrador();
@@ -30,15 +29,25 @@ public abstract class MenuAdm {
                 continue;
             }
 
+
             switch (opcao) {
-                case 1 -> executorService.submit(()->crudClientes(input));
-                case 2 -> executorService.submit(()->crudAgencias(input));
-                case 3 -> executorService.submit(()->crudVeiculos(input));
+                case 1 -> {
+                    crudClientes(input);
+                    System.out.println();
+                }
+                case 2 -> {
+                    crudAgencias(input);
+                    System.out.println();
+                }
+                case 3 -> {
+                    crudVeiculos(input);
+                    System.out.println();
+                }
                 case 4 -> ativo = false;
                 default -> System.out.println("Opção inválida. Tente novamente.");
             }
         }
-        executorService.shutdown();
+
     }
 
     private static void exibirMenuAdministrador() {
@@ -55,7 +64,7 @@ public abstract class MenuAdm {
 
     public static void mostrarOpcoesCrud(String nomeCrud) {
         System.out.println("==============================================");
-        System.out.println("|                CRUD - " + nomeCrud + "                |");
+        System.out.println("|     CRUD - " + nomeCrud + "                |");
         System.out.println("==============================================");
         System.out.println("| 01 - Adicionar                            |");
         System.out.println("| 02 - Editar                               |");

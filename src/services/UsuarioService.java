@@ -43,7 +43,7 @@ public class UsuarioService {
     }
 
     private static void adicionarAdministrador(Scanner input, Integer idUsuario, String email, String nome) {
-        if (!emailExistente(email, null)) {
+        if (!emailExistente(email)) {
             System.out.println("Digite o número de registro do funcionário: ");
             Integer numeroRegistro = null;
 
@@ -65,7 +65,7 @@ public class UsuarioService {
     }
 
     private static void adicionarPessoaJuridica(Scanner input, Integer idUsuario, String email, String nome, Integer idCliente) {
-        if (!emailExistente(email, null)) {
+        if (!emailExistente(email)) {
             System.out.println("Digite o CNPJ do usuário: ");
             String cnpj = null;
 
@@ -91,7 +91,7 @@ public class UsuarioService {
     }
 
     private static void adicionarPessoaFisica(Scanner input, Integer idUsuario, String email, String nome, Integer idCliente) {
-        if (!emailExistente(email, null)) {
+        if (!emailExistente(email)) {
             String cpf = null;
             System.out.println("Digite o CPF do usuário: ");
 
@@ -200,37 +200,34 @@ public class UsuarioService {
         System.out.println("Digite o email do usuario: ");
         String email = input.nextLine(); // TODO: validação de email?
 
-        Usuario usuario = usuarioRepository.buscar(email);
+        Optional<Usuario> usuarioOptional = usuarioRepository.buscar(email);
 
-        if (usuario instanceof Administrador administrador) {
-            System.out.println("\n" + administrador.mostrarAdmin());
-        } else if (usuario instanceof PessoaFisica pessoaFisica) {
-            System.out.println("\n" + pessoaFisica.mostrarPF());
-        } else if (usuario instanceof PessoaJuridica pessoaJuridica) {
-            System.out.println("\n" + pessoaJuridica.mostrarPJ());
-        } else {
+        usuarioOptional.ifPresentOrElse(usuario -> {
+            if (usuario instanceof Administrador administrador) {
+                System.out.println("\n" + administrador.mostrarAdmin());
+            } else if (usuario instanceof PessoaFisica pessoaFisica) {
+                System.out.println("\n" + pessoaFisica.mostrarPF());
+            } else if (usuario instanceof PessoaJuridica pessoaJuridica) {
+                System.out.println("\n" + pessoaJuridica.mostrarPJ());
+            }
+        }, () -> {
             System.out.println(ConsoleColors.CYAN_BOLD_BRIGHT + "\nUsuário não encontrado.\n" + ConsoleColors.RESET);
-        }
+        });
     }
 
     public static Optional<Cliente> buscarCliente(String email) {
-        Usuario usuario = usuarioRepository.buscar(email);
-
-        Optional<Cliente> cliente = Optional.empty();
-
-        if (usuario instanceof Cliente cliente) {
-            return Optional.of(cliente);
-        }
-        return Optional.empty();
+        return usuarioRepository.buscar(email)
+                .filter(usuario -> usuario instanceof Cliente)
+                .map(usuario -> (Cliente) usuario);
     }
 
-    public static void buscarPorParteDoNome(Scanner input){
+    public static void buscarPorParteDoNome(Scanner input) {
         System.out.println("Digite uma parte do nome do usuário: ");
         String parteNome = input.nextLine();
 
         List<Usuario> usuarios = UsuarioRepository.buscarPorParteDoNome(parteNome);
 
-        for(Usuario usuario : usuarios){
+        for (Usuario usuario : usuarios) {
             System.out.println(usuario.mostrarUsuario());
         }
     }
@@ -294,24 +291,18 @@ public class UsuarioService {
     }
 
     private static Integer obterUltimoIdCliente() {
-        Integer ultimoID = 0;
-        for (Usuario u : Locadora.getUsuarios()) {
-            if (u instanceof Cliente) {
-                if (((Cliente) u).getIdCliente() > ultimoID) {
-                    ultimoID = ((Cliente) u).getIdCliente();
-                }
-            }
-        }
-        return ultimoID;
+        return Locadora.getUsuarios().stream()
+                .filter(u -> u instanceof Cliente)
+                .map(u -> ((Cliente) u).getIdCliente())
+                .max(Integer::compareTo)
+                .orElse(0);
     }
 
+
     private static Integer obterUltimoIdUsuario() {
-        Integer ultimoID = 0;
-        for (Usuario u : Locadora.getUsuarios()) {
-            if (u.getId() > ultimoID) {
-                ultimoID = u.getId();
-            }
-        }
-        return ultimoID;
+        return Locadora.getUsuarios().stream()
+                .map(Usuario::getId)
+                .max(Integer::compareTo)
+                .orElse(0);
     }
 }

@@ -13,6 +13,7 @@ public class MenuCrudAgencias {
     public static void crudAgencias(Scanner input) {
         boolean ativo = true;
 
+        System.out.println();
         while (ativo) {
             exibirMenu();
 

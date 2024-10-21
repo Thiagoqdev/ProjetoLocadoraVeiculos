@@ -34,6 +34,8 @@ public abstract class MenuPrincipal {
                 case 0 -> {
                     System.out.println(ConsoleColors.CYAN_BOLD + "Saindo..." + ConsoleColors.RESET);
                     ativo = false;
+                    fecharScanner();
+                    System.exit(0);
                 }
                 default -> System.out.println("Opção inválida. Tente novamente.");
             }
