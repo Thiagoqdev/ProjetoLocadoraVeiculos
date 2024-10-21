@@ -105,7 +105,7 @@ flowchart TD
 
 1. **Clone do repositório**:
     ```bash
-   git clone https://github.com/danielrdrgsn/projeto-rental-cars
+   git clone https://github.com/Thiagoqdev/ProjetoLocadoraVeiculos.git
    ```
 2. **Navegue até o diretório do projeto**
    ```bash 
