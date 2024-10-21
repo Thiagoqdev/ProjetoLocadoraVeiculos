@@ -15,6 +15,8 @@ public abstract class MenuCrudClientes {
 
         while(ativo) {
             int opcao;
+            System.out.println();
+
             mostrarOpcoesCrud("Clientes");
 
             try {

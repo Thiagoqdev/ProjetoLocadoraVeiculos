@@ -15,6 +15,7 @@ public class MenuCrudVeiculos {
 
         while(ativo) {
             int opcao;
+            System.out.println();
             mostrarOpcoesCrud("Veículos");
 
             try {
