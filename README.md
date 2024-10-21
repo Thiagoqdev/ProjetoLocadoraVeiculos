@@ -1,4 +1,9 @@
-# Documentação do Projeto Rental Cars
+
+## Participante
+- [Thiago Vinícius](https://github.com/Thiagoqdev)
+
+
+# Documentação do Projeto Rental Cars Modulo Tenicas de programação 
 
 ## Introdução
 
@@ -109,7 +114,7 @@ flowchart TD
    ```
 2. **Navegue até o diretório do projeto**
    ```bash 
-    cd projeto-rental-cars/src
+    cd ProjetoLocadoraVeiculos/src
 
 ### Executando o programa
 
@@ -118,5 +123,3 @@ flowchart TD
 ```
 
 
-## Participante
-- [Thiago Vinícius](https://github.com/Thiagoqdev)
